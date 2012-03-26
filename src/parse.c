@@ -330,7 +330,15 @@ Dsymbols *Parser::parseDeclDefs(int once)
                     goto Lstc2;
                 }
                 break;
-
+#if DMDV2
+            case TOKat:
+                stc = parseAttribute();
+                // If the attribute is undefined, it means we are facing a user defined @ttribute.
+                if(stc != STCundefined) goto Lstc;
+                s = parseAttributeInstance();
+                
+                break;
+#endif
             case TOKconst:
                 if (peekNext() == TOKlparen)
                     goto Ldeclaration;
@@ -382,7 +390,6 @@ Dsymbols *Parser::parseDeclDefs(int once)
             case TOKtls:          stc = STCtls;          goto Lstc;
             case TOKgshared:      stc = STCgshared;      goto Lstc;
             //case TOKmanifest:   stc = STCmanifest;     goto Lstc;
-            case TOKat:           stc = parseAttribute(); goto Lstc;
 #endif
 
             Lstc:
@@ -686,7 +693,8 @@ StorageClass Parser::parseAttribute()
     else if (token.ident == Id::disable)
         stc = STCdisable;
     else
-        error("valid attribute identifiers are @property, @safe, @trusted, @system, @disable not @%s", token.toChars());
+        // error("valid attribute identifiers are @property, @safe, @trusted, @system, @disable not @%s", token.toChars());
+        stc = STCundefined;
     return stc;
 }
 #endif
@@ -2158,15 +2166,12 @@ Objects *Parser::parseTemplateArgument()
  * 
  */
 AttributeDeclaration *Parser::parseAttributeDeclaration() {
-    FuncDeclaration *f;
-    Identifier *id;
-    TemplateParameters *tpl = NULL;
-    Expression *constraint = NULL;
+    TemplateParameters *tpl;
     Loc loc = this->loc;
 
     nextToken();
     if (token.value != TOKidentifier) error("AttributeIdentifier expected following @ttribute");
-    id = token.ident;
+    Identifier *id = token.ident;
     nextToken();
 
     if (token.value == TOKlparen)       // template parameters if specified.
@@ -2176,11 +2181,26 @@ AttributeDeclaration *Parser::parseAttributeDeclaration() {
         tpl = new TemplateParameters();
     }
     
-    constraint = parseConstraint();
-
+    Expression *constraint = parseConstraint();
+    
     Statement* body = parseStatement(PScurly);
     
     return new AttributeDeclaration(loc, this->loc, id, tpl, constraint, body);
+}
+
+AttributeInstance* Parser::parseAttributeInstance() {
+    Identifier *id = token.ident;
+    Objects *arglist = NULL;
+    Loc loc = this->loc;
+    
+    nextToken();
+    if(token.value == TOKlparen) {    // parameters are specified.
+        arglist = parseTemplateArgumentList();
+    } else {
+        arglist = new Objects();
+    }
+    
+    return new AttributeInstance(loc, id, arglist);
 }
 
 Import *Parser::parseImport(Dsymbols *decldefs, int isstatic)

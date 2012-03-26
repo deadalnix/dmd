@@ -25,6 +25,17 @@ struct AttributeDeclaration : ScopeDsymbol
     AttributeDeclaration(Loc loc, Loc endLoc, Identifier *id, TemplateParameters *parameters,
         Expression *constraint, Statement *body);
     void semantic(Scope *sc);
+    
+    AttributeDeclaration *isAttributeDeclaration() { return this; }
+};
+
+struct AttributeInstance : ScopeDsymbol
+{
+    Identifier* attr_id;
+    Objects *arglist;
+    
+    AttributeInstance(Loc loc, Identifier *attr_id, Objects* arglist);
+    void semantic(Scope *sc);
 };
 
 #endif /* DMD_ATTRIBUTE_H */

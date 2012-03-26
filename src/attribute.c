@@ -54,3 +54,33 @@ void AttributeDeclaration::semantic(Scope *sc) {
 	tpl->semantic(sc);
 }
 
+AttributeInstance::AttributeInstance(Loc loc, Identifier *attr_id, Objects* arglist)
+    : ScopeDsymbol(NULL)
+{
+#if LOG
+    printf("AttributeInstance(this = %p, ident = '%s')\n", this, attr_id ? attr_id->toChars() : "null");
+#endif
+
+     this->loc = loc;
+     this->attr_id = attr_id;
+     this->arglist = arglist;
+}
+
+void AttributeInstance::semantic(Scope *sc) {
+#if LOG
+    printf("AttributeInstance::semantic(this = %p)\n", this);
+    printf("sc->stc = %llx\n", sc->stc);
+    printf("sc->module = %s\n", sc->module->toChars());
+#endif
+
+	Dsymbol* dsym = sc->search(loc, attr_id, NULL);
+	if(dsym == NULL || dsym->isAttributeDeclaration() == NULL) {
+	    error("impossible to find attribute @%s", attr_id->toChars());
+	    return;
+	}
+	
+	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
+	i->tiargs = arglist;
+	i->semantic(sc);
+}
+

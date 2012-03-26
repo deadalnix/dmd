@@ -62,6 +62,7 @@ struct ScopeDsymbol;
 struct TemplateDeclaration;
 struct TemplateInstance;
 struct TemplateMixin;
+struct AttributeDeclaration;
 struct EnumMember;
 struct ScopeDsymbol;
 struct WithScopeSymbol;
@@ -216,6 +217,7 @@ struct Dsymbol : Object
     virtual TemplateDeclaration *isTemplateDeclaration() { return NULL; }
     virtual TemplateInstance *isTemplateInstance() { return NULL; }
     virtual TemplateMixin *isTemplateMixin() { return NULL; }
+    virtual AttributeDeclaration *isAttributeDeclaration() { return NULL; }
     virtual Declaration *isDeclaration() { return NULL; }
     virtual ThisDeclaration *isThisDeclaration() { return NULL; }
     virtual TupleDeclaration *isTupleDeclaration() { return NULL; }
