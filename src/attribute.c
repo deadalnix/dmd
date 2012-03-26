@@ -54,7 +54,7 @@ void AttributeDeclaration::semantic(Scope *sc) {
 	tpl->semantic(sc);
 }
 
-AttributeInstance::AttributeInstance(Loc loc, Identifier *attr_id, Objects* arglist)
+AttributeInstance::AttributeInstance(Loc loc, Identifier *attr_id, Declaration* decl, Objects* arglist)
     : ScopeDsymbol(NULL)
 {
 #if LOG
@@ -80,7 +80,6 @@ void AttributeInstance::semantic(Scope *sc) {
 	}
 	
 	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
-	i->tiargs = arglist;
 	i->semantic(sc);
 }
 

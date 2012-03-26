@@ -2200,7 +2200,18 @@ AttributeInstance* Parser::parseAttributeInstance() {
         arglist = new Objects();
     }
     
-    return new AttributeInstance(loc, id, arglist);
+    // TODO: perform usual checks.
+    Dsymbols* dsyms = parseDeclDefs(1);
+    if(dsyms->dim != 1) {
+        error("foobar");
+    }
+    
+    Declaration* decl = (*dsyms)[0]->isDeclaration();
+    if(decl == NULL) {
+        error("fizzbuzz");
+    }
+    
+    return new AttributeInstance(loc, id, decl, arglist);
 }
 
 Import *Parser::parseImport(Dsymbols *decldefs, int isstatic)

@@ -34,7 +34,7 @@ struct AttributeInstance : ScopeDsymbol
     Identifier* attr_id;
     Objects *arglist;
     
-    AttributeInstance(Loc loc, Identifier *attr_id, Objects* arglist);
+    AttributeInstance(Loc loc, Identifier *attr_id, Declaration* decl, Objects* arglist);
     void semantic(Scope *sc);
 };
 
