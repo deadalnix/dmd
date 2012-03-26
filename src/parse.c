@@ -196,6 +196,10 @@ Dsymbols *Parser::parseDeclDefs(int once)
             case TOKtemplate:
                 s = (Dsymbol *)parseTemplateDeclaration(0);
                 break;
+            
+            case TOKattribute:
+                s = (Dsymbol *)parseAttributeDeclaration();
+                break;
 
             case TOKmixin:
             {   Loc loc = this->loc;
@@ -2146,6 +2150,47 @@ Objects *Parser::parseTemplateArgument()
     if (token.value == TOKnot)
         error("multiple ! arguments are not allowed");
     return tiargs;
+}
+
+/************
+ * Parse @attribute declarations
+ * 
+ */
+TemplateDeclaration *Parser::parseAttributeDeclaration() {
+    FuncDeclaration *f;
+    Identifier *id;
+    TemplateParameters *tpl = NULL;
+    Expression *constraint = NULL;
+    Loc loc = this->loc;
+
+    nextToken();
+    if (token.value != TOKidentifier) error("AttributeIdentifier expected following @ttribute");
+    id = token.ident;
+    nextToken();
+
+    if (token.value == TOKlparen)       // template parameter and constraint
+    {
+        tpl = parseTemplateParameterList();
+    } else {
+        tpl = new TemplateParameters();
+    }
+    
+    Identifier* astTypeId = Lexer::uniqueId("__AstType");
+    tpl->push(new TemplateTypeParameter(loc, astTypeId, NULL, NULL));
+    constraint = parseConstraint();
+
+    Type* astType = new TypeIdentifier(loc, astTypeId);
+    Parameters* ps = new Parameters();
+    ps->push(new Parameter(0, astType, new Identifier("ast", TOKidentifier), NULL));
+    
+    Statement* body = parseStatement(PScurly);
+    f = new FuncDeclaration(loc, this->loc, id, STCundefined, new TypeFunction(ps, astType, 0, LINKd, STCundefined));
+    f->fbody = body;
+    
+    Dsymbols *decldefs = new Dsymbols();
+    decldefs->push(f);
+    
+    return new TemplateDeclaration(loc, id, tpl, constraint, decldefs, 0);;
 }
 
 Import *Parser::parseImport(Dsymbols *decldefs, int isstatic)

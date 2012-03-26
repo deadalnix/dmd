@@ -1205,9 +1205,27 @@ void Lexer::scan(Token *t)
             SINGLE(':', TOKcolon)
             SINGLE('$', TOKdollar)
 #if DMDV2
-            SINGLE('@', TOKat)
+
 #endif
 #undef SINGLE
+
+#if DMDV2
+            case '@':
+            {
+                unsigned char* atp = ++p;
+                unsigned char* ttribute = (unsigned char*) "ttribute";
+                for(int i = 0; i < 8; ++i) {
+                    if(*p++ != *ttribute++) {
+                        t->value = TOKat;
+                        p = atp;
+                        return;
+                    }
+                }
+            }
+                
+                t->value = TOKattribute;
+                return;
+#endif
 
 #define DOUBLE(c1,tok1,c2,tok2)         \
             case c1:                    \
@@ -3076,6 +3094,7 @@ static Keyword keywords[] =
     {   "__LINE__",     TOKline         },
     {   "shared",       TOKshared       },
     {   "immutable",    TOKimmutable    },
+    {   "@ttribute",    TOKattribute    },
 #endif
 };
 
