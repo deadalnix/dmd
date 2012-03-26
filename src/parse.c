@@ -21,6 +21,7 @@
 #include "cond.h"
 #include "mtype.h"
 #include "template.h"
+#include "attribute.h"
 #include "staticassert.h"
 #include "expression.h"
 #include "statement.h"
@@ -2156,7 +2157,7 @@ Objects *Parser::parseTemplateArgument()
  * Parse @attribute declarations
  * 
  */
-TemplateDeclaration *Parser::parseAttributeDeclaration() {
+AttributeDeclaration *Parser::parseAttributeDeclaration() {
     FuncDeclaration *f;
     Identifier *id;
     TemplateParameters *tpl = NULL;
@@ -2168,29 +2169,18 @@ TemplateDeclaration *Parser::parseAttributeDeclaration() {
     id = token.ident;
     nextToken();
 
-    if (token.value == TOKlparen)       // template parameter and constraint
+    if (token.value == TOKlparen)       // template parameters if specified.
     {
         tpl = parseTemplateParameterList();
     } else {
         tpl = new TemplateParameters();
     }
     
-    Identifier* astTypeId = Lexer::uniqueId("__AstType");
-    tpl->push(new TemplateTypeParameter(loc, astTypeId, NULL, NULL));
     constraint = parseConstraint();
 
-    Type* astType = new TypeIdentifier(loc, astTypeId);
-    Parameters* ps = new Parameters();
-    ps->push(new Parameter(0, astType, Lexer::idPool("ast"), NULL));
-    
     Statement* body = parseStatement(PScurly);
-    f = new FuncDeclaration(loc, this->loc, id, STCundefined, new TypeFunction(ps, astType, 0, LINKd, STCundefined));
-    f->fbody = body;
     
-    Dsymbols *decldefs = new Dsymbols();
-    decldefs->push(f);
-    
-    return new TemplateDeclaration(loc, id, tpl, constraint, decldefs, 0);;
+    return new AttributeDeclaration(loc, this->loc, id, tpl, constraint, body);
 }
 
 Import *Parser::parseImport(Dsymbols *decldefs, int isstatic)

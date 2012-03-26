@@ -82,7 +82,7 @@ DMD_OBJS = \
 	type.o typinf.o util.o var.o version.o strtold.o utf.o staticassert.o \
 	unialpha.o toobj.o toctype.o toelfdebug.o entity.o doc.o macro.o \
 	hdrgen.o delegatize.o aa.o ti_achar.o toir.o interpret.o traits.o \
-	builtin.o clone.o aliasthis.o intrange.o \
+	builtin.o clone.o aliasthis.o intrange.o attribute.o \
 	man.o arrayop.o port.o response.o async.o json.o speller.o aav.o unittests.o \
 	imphint.o argtypes.o ti_pvoid.o apply.o canthrow.o sideeffect.o
 
@@ -110,6 +110,7 @@ SRC = win32.mak posix.mak \
 	builtin.c clone.c lib.h libomf.c libelf.c libmach.c arrayop.c \
 	aliasthis.h aliasthis.c json.h json.c unittests.c imphint.c \
 	argtypes.c intrange.c apply.c canthrow.c sideeffect.c \
+	attribute.h attribute.c \
 	$C/cdef.h $C/cc.h $C/oper.h $C/ty.h $C/optabgen.c \
 	$C/global.h $C/code.h $C/type.h $C/dt.h $C/cgcv.h \
 	$C/el.h $C/iasm.h $C/rtlsym.h $C/html.h \
@@ -537,6 +538,9 @@ struct.o: struct.c
 template.o: template.c
 	$(CC) -c $(CFLAGS) $<
 
+attribute.o: attribute.c
+	$(CC) -c $(CFLAGS) $<
+
 ti_achar.o: $C/ti_achar.c $C/tinfo.h
 	$(CC) -c $(MFLAGS) -I. $<
 
@@ -652,6 +656,7 @@ endif
 	gcov s2ir.c
 	gcov struct.c
 	gcov template.c
+	gcov attribute.c
 	gcov tk.c
 	gcov tocsym.c
 	gcov todt.c

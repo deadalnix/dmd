@@ -43,6 +43,7 @@ struct Condition;
 struct Module;
 struct ModuleDeclaration;
 struct TemplateDeclaration;
+struct AttributeDeclaration;
 struct TemplateInstance;
 struct StaticAssert;
 
@@ -84,7 +85,7 @@ struct Parser : Lexer
     Objects *parseTemplateArgumentList();
     Objects *parseTemplateArgumentList2();
     Objects *parseTemplateArgument();
-    TemplateDeclaration *parseAttributeDeclaration();
+    AttributeDeclaration *parseAttributeDeclaration();
     StaticAssert *parseStaticAssert();
     TypeQualified *parseTypeof();
     Type *parseVector();
