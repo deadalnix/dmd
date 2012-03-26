@@ -165,6 +165,7 @@ enum TOK
         TOKline,
         TOKfile,
         TOKshared,
+        TOKattribute,
         TOKat,
         TOKpow,
         TOKpowass,
