@@ -2181,7 +2181,7 @@ TemplateDeclaration *Parser::parseAttributeDeclaration() {
 
     Type* astType = new TypeIdentifier(loc, astTypeId);
     Parameters* ps = new Parameters();
-    ps->push(new Parameter(0, astType, new Identifier("ast", TOKidentifier), NULL));
+    ps->push(new Parameter(0, astType, Lexer::idPool("ast"), NULL));
     
     Statement* body = parseStatement(PScurly);
     f = new FuncDeclaration(loc, this->loc, id, STCundefined, new TypeFunction(ps, astType, 0, LINKd, STCundefined));
