@@ -64,7 +64,6 @@ struct TemplateInstance;
 struct TemplateMixin;
 struct AttributeDeclaration;
 struct EnumMember;
-struct ScopeDsymbol;
 struct WithScopeSymbol;
 struct ArrayScopeSymbol;
 struct SymbolDeclaration;

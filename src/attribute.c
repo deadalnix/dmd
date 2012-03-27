@@ -55,8 +55,8 @@ void AttributeDeclaration::semantic(Scope *sc) {
 	tpl->semantic(sc);
 }
 
-AttributeInstance::AttributeInstance(Loc loc, Identifier *attr_id, Declaration* decl, Objects* arglist)
-    : ScopeDsymbol(NULL)
+AttributeInstance::AttributeInstance(Loc loc, Identifier *attr_id, Dsymbols* decl, Objects* arglist)
+    : AttribDeclaration(decl)
 {
 #if LOG
     printf("AttributeInstance(this = %p, ident = '%s')\n", this, attr_id ? attr_id->toChars() : "null");
@@ -84,5 +84,7 @@ void AttributeInstance::semantic(Scope *sc) {
 	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
 	i->semantic(sc);
 	arglist->pop();
+	
+	AttribDeclaration::semantic(sc);
 }
 

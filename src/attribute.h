@@ -15,6 +15,7 @@
 
 #include "root.h"
 #include "arraytypes.h"
+#include "attrib.h"
 #include "dsymbol.h"
 #include "template.h"
 
@@ -29,12 +30,12 @@ struct AttributeDeclaration : ScopeDsymbol
     AttributeDeclaration *isAttributeDeclaration() { return this; }
 };
 
-struct AttributeInstance : ScopeDsymbol
+struct AttributeInstance : AttribDeclaration
 {
     Identifier* attr_id;
     Objects *arglist;
     
-    AttributeInstance(Loc loc, Identifier *attr_id, Declaration* decl, Objects* arglist);
+    AttributeInstance(Loc loc, Identifier *attr_id, Dsymbols* decl, Objects* arglist);
     void semantic(Scope *sc);
 };
 
