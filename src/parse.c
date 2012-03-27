@@ -2200,15 +2200,15 @@ AttributeInstance* Parser::parseAttributeInstance() {
         arglist = new Objects();
     }
     
-    // TODO: perform usual checks.
     Dsymbols* dsyms = parseDeclDefs(1);
     if(dsyms->dim != 1) {
-        error("foobar");
+        error("Attribute can only qualify one declaration");
+        return NULL;
     }
     
     Declaration* decl = (*dsyms)[0]->isDeclaration();
     if(decl == NULL) {
-        error("fizzbuzz");
+        error("Attribute must qualify a declaration");
     }
     
     return new AttributeInstance(loc, id, decl, arglist);

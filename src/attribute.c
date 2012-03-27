@@ -80,7 +80,7 @@ void AttributeInstance::semantic(Scope *sc) {
 	    return;
 	}
 	
-	arglist->push(new TypeBasic(Tint32));
+	arglist->push(Type::tint32);
 	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
 	i->semantic(sc);
 	arglist->pop();
