@@ -16,6 +16,7 @@
 #include "declaration.h"
 #include "scope.h"
 #include "module.h"
+#include "mtype.h"
 #include "identifier.h"
 
 #define LOG     1
@@ -79,7 +80,9 @@ void AttributeInstance::semantic(Scope *sc) {
 	    return;
 	}
 	
+	arglist->push(new TypeBasic(Tint32));
 	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
 	i->semantic(sc);
+	arglist->pop();
 }
 
