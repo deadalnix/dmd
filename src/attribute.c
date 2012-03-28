@@ -75,13 +75,25 @@ void AttributeInstance::semantic(Scope *sc) {
 #endif
 
 	Dsymbol* dsym = sc->search(loc, attr_id, NULL);
-	if(dsym == NULL || dsym->isAttributeDeclaration() == NULL) {
+	if(dsym == NULL) {
 	    error("impossible to find attribute @%s", attr_id->toChars());
 	    return;
 	}
 	
+	AttributeDeclaration* attrdecl = dsym->isAttributeDeclaration();
+	if(attrdecl == NULL) {
+	    error("%s is not an attribute", attr_id->toChars());
+	    return;
+	}
+	
+	Expressions* args = new Expressions();
+	args->push(new IntegerExp(loc, 42, Type::tint32));
+	
+	Expressions* args2 = new Expressions();
+	args2->push(new NewExp(loc, NULL, new Expressions(), Type::tint32, args));
+	
 	arglist->push(Type::tint32);
-	TemplateInstance *i = new TemplateInstance(loc, dsym->isAttributeDeclaration()->tpl, arglist);
+	TemplateInstance *i = new TemplateInstance(loc, attrdecl->tpl, arglist);
 	i->semantic(sc);
 	arglist->pop();
 	
