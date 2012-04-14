@@ -159,7 +159,7 @@ Type *TupleDeclaration::getType()
         /* It's only a type tuple if all the Object's are types
          */
         for (size_t i = 0; i < objects->dim; i++)
-        {   Object *o = objects->tdata()[i];
+        {   Object *o = (*objects)[i];
 
             if (o->dyncast() != DYNCAST_TYPE)
             {
@@ -176,7 +176,7 @@ Type *TupleDeclaration::getType()
         OutBuffer buf;
         int hasdeco = 1;
         for (size_t i = 0; i < types->dim; i++)
-        {   Type *t = types->tdata()[i];
+        {   Type *t = (*types)[i];
 
             //printf("type = %s\n", t->toChars());
 #if 0
@@ -187,7 +187,7 @@ Type *TupleDeclaration::getType()
 #else
             Parameter *arg = new Parameter(0, t, NULL, NULL);
 #endif
-            args->tdata()[i] = arg;
+            (*args)[i] = arg;
             if (!t->deco)
                 hasdeco = 0;
         }
@@ -204,7 +204,7 @@ int TupleDeclaration::needThis()
 {
     //printf("TupleDeclaration::needThis(%s)\n", toChars());
     for (size_t i = 0; i < objects->dim; i++)
-    {   Object *o = objects->tdata()[i];
+    {   Object *o = (*objects)[i];
         if (o->dyncast() == DYNCAST_EXPRESSION)
         {   Expression *e = (Expression *)o;
             if (e->op == TOKdsymbol)
@@ -760,6 +760,7 @@ void VarDeclaration::semantic(Scope *sc)
     if (!type)
     {   inuse++;
 
+        //printf("inferring type for %s with init %s\n", toChars(), init->toChars());
         ArrayInitializer *ai = init->isArrayInitializer();
         if (ai)
         {   Expression *e;
@@ -780,7 +781,6 @@ void VarDeclaration::semantic(Scope *sc)
         else
             type = init->inferType(sc);
 
-//printf("test2: %s, %s, %s\n", toChars(), type->toChars(), type->deco);
 //      type = type->semantic(loc, sc);
 
         inuse--;
@@ -847,7 +847,14 @@ void VarDeclaration::semantic(Scope *sc)
 
     Type *tb = type->toBasetype();
     if (tb->ty == Tvoid && !(storage_class & STClazy))
-    {   error("voids have no value");
+    {
+        if (inferred)
+        {
+            error("type %s is inferred from initializer %s, and variables cannot be of type void",
+                type->toChars(), init->toChars());
+        }
+        else
+            error("variables cannot be of type void");
         type = Type::terror;
         tb = type;
     }
@@ -888,7 +895,7 @@ void VarDeclaration::semantic(Scope *sc)
             for (size_t pos = 0; pos < iexps->dim; pos++)
             {
             Lexpand1:
-                Expression *e = iexps->tdata()[pos];
+                Expression *e = (*iexps)[pos];
                 Parameter *arg = Parameter::getNth(tt->arguments, pos);
                 arg->type = arg->type->semantic(loc, sc);
                 //printf("[%d] iexps->dim = %d, ", pos, iexps->dim);
@@ -985,7 +992,7 @@ Lnomatch:
 
             Expression *einit = ie;
             if (ie && ie->op == TOKtuple)
-            {   einit = ((TupleExp *)ie)->exps->tdata()[i];
+            {   einit = (*((TupleExp *)ie)->exps)[i];
             }
             Initializer *ti = init;
             if (einit)
@@ -1005,7 +1012,7 @@ Lnomatch:
             }
 
             Expression *e = new DsymbolExp(loc, v);
-            exps->tdata()[i] = e;
+            (*exps)[i] = e;
         }
         TupleDeclaration *v2 = new TupleDeclaration(loc, ident, exps);
         v2->isexp = 1;
