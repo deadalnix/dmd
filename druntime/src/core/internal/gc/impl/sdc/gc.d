@@ -19,7 +19,6 @@ extern(C) nothrow {
         void *__sd_gc_realloc(void *ptr, size_t size);
         @nogc void *__sd_gc_free(void *ptr);
         @nogc BlkInfo __sd_gc_druntime_allocInfo(void *ptr);
-        void __sd_gc_setBlockFinalizer(typeof(&_destroyBlockCtx) fn);
         void rt_finalize2(void* p, bool det, bool resetMemory) nothrow;
 }
 
@@ -71,7 +70,6 @@ extern(C) void _d_register_sdc_gc()
 {
     // HACK: this is going to set up the ThreadCache in SDC for the main thread.
     __sd_gc_init();
-    __sd_gc_setBlockFinalizer(&_destroyBlockCtx);
     import core.gc.registry;
     registerGCFactory("sdc", &initialize);
 }
@@ -208,7 +206,7 @@ final class SnazzyGC : GC
         //   if it's a struct, then the typeinfo will be used to finalize.
         void *ctx = null;
         if (bits & BlkAttr.FINALIZE)
-            ctx = (bits & BlkAttr.STRUCTFINALIZE) ? cast(void*)ti : TYPEINFO_IN_BLOCK;
+            ctx = (bits & BlkAttr.STRUCTFINAL) ? cast(void*)ti : TYPEINFO_IN_BLOCK;
 
         __sd_gc_druntime_qalloc(&blkinfo, size, bits, ctx);
         return blkinfo;
@@ -226,7 +224,7 @@ final class SnazzyGC : GC
 
         void *ctx = null;
         if (bits & BlkAttr.FINALIZE)
-            ctx = (bits & BlkAttr.STRUCTFINALIZE) ? cast(void*)ti : TYPEINFO_IN_BLOCK;
+            ctx = (bits & BlkAttr.STRUCTFINAL) ? cast(void*)ti : TYPEINFO_IN_BLOCK;
 
         // TODO: need to hook SDC's zero alloc function
         __sd_gc_druntime_qalloc(&blkinfo, size, bits, cast(void *)ti);
